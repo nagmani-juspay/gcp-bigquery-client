@@ -58,7 +58,7 @@ time = { version = "0.3.37", features = [
 cloud-storage = { version = "0.11.1", features = [
     "global-client",
 ], optional = true }
-async-trait = "0.1.85"
+async-trait = "0.1.83"
 dyn-clone = "1.0.17"
 prost = "0.13.4"
 prost-types = "0.13.4"
