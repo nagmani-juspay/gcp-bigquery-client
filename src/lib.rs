@@ -133,9 +133,9 @@ impl Client {
     /// Constructs a new BigQuery client.
     /// # Argument
     /// * `sa_key_file` - A GCP Service Account Key file.
-    pub async fn from_service_account_key_file_wop(sa_key_file: &str) -> Result<Self, BQError> {
+    pub async fn from_service_account_key_file_wop(sa_key_file: &str, proxy_url: Option<&str>) -> Result<Self, BQError> {
         ClientBuilder::new()
-            .build_from_service_account_key_file(sa_key_file)
+            .build_from_service_account_key_file_wop(sa_key_file, proxy_url)
             .await
     }
 
@@ -145,9 +145,9 @@ impl Client {
     /// * `readonly` - A boolean setting whether the acquired token scope should be readonly.
     ///
     /// [`ServiceAccountKey`]: https://docs.rs/yup-oauth2/*/yup_oauth2/struct.ServiceAccountKey.html
-    pub async fn from_service_account_key_wop(sa_key: ServiceAccountKey, readonly: bool) -> Result<Self, BQError> {
+    pub async fn from_service_account_key_wop(sa_key: ServiceAccountKey, readonly: bool, proxy_url: Option<&str>) -> Result<Self, BQError> {
         ClientBuilder::new()
-            .build_from_service_account_key(sa_key, readonly)
+            .build_from_service_account_key_wop(sa_key, readonly, proxy_url)
             .await
     }
 
