@@ -110,6 +110,47 @@ impl Client {
             .await
     }
 
+    pub async fn from_authenticator_with_optional_proxy(auth: Arc<dyn Authenticator>, proxy_url: Option<&str>) -> Result<Self, BQError> {
+        let write_client = StorageApi::new_write_client().await?;
+        let client = if let Some(url) = proxy_url {
+            let proxy = reqwest::Proxy::https(url)?;
+            reqwest::Client::builder().proxy(proxy).build()?
+        } else {
+            reqwest::Client::new()
+        };
+        Ok(Self {
+            dataset_api: DatasetApi::new(client.clone(), Arc::clone(&auth)),
+            table_api: TableApi::new(client.clone(), Arc::clone(&auth)),
+            job_api: JobApi::new(client.clone(), Arc::clone(&auth)),
+            tabledata_api: TableDataApi::new(client.clone(), Arc::clone(&auth)),
+            routine_api: RoutineApi::new(client.clone(), Arc::clone(&auth)),
+            model_api: ModelApi::new(client.clone(), Arc::clone(&auth)),
+            project_api: ProjectApi::new(client, Arc::clone(&auth)),
+            storage_api: StorageApi::new(write_client, auth),
+        })
+    }
+
+    /// Constructs a new BigQuery client.
+    /// # Argument
+    /// * `sa_key_file` - A GCP Service Account Key file.
+    pub async fn from_service_account_key_file_wop(sa_key_file: &str) -> Result<Self, BQError> {
+        ClientBuilder::new()
+            .build_from_service_account_key_file(sa_key_file)
+            .await
+    }
+
+    /// Constructs a new BigQuery client from a [`ServiceAccountKey`].
+    /// # Argument
+    /// * `sa_key` - A GCP Service Account Key `yup-oauth2` object.
+    /// * `readonly` - A boolean setting whether the acquired token scope should be readonly.
+    ///
+    /// [`ServiceAccountKey`]: https://docs.rs/yup-oauth2/*/yup_oauth2/struct.ServiceAccountKey.html
+    pub async fn from_service_account_key_wop(sa_key: ServiceAccountKey, readonly: bool) -> Result<Self, BQError> {
+        ClientBuilder::new()
+            .build_from_service_account_key(sa_key, readonly)
+            .await
+    }
+
     pub async fn with_workload_identity(readonly: bool) -> Result<Self, BQError> {
         ClientBuilder::new().build_with_workload_identity(readonly).await
     }

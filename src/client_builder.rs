@@ -120,6 +120,44 @@ impl ClientBuilder {
         client.v2_base_url(self.v2_base_url.clone());
         Ok(client)
     }
+
+    // function which optionally use proxy
+    pub async fn build_from_authenticator_wop(
+        &self,
+        auth: Arc<dyn Authenticator>,
+        proxy_url: Option<&str>
+    ) -> Result<Client, BQError> {
+        let mut client = Client::from_authenticator_with_optional_proxy(auth, proxy_url).await?;
+        client.v2_base_url(self.v2_base_url.clone());
+        Ok(client)
+    }
+
+    pub async fn build_from_service_account_key_wop(
+        &self,
+        sa_key: ServiceAccountKey,
+        readonly: bool,
+        proxy_url: Option<&str>
+    ) -> Result<Client, BQError> {
+        let scope = if readonly {
+            format!("{}.readonly", self.auth_base_url)
+        } else {
+            self.auth_base_url.clone()
+        };
+        let sa_auth = ServiceAccountAuthenticator::from_service_account_key(sa_key, &[&scope]).await?;
+
+        self.build_from_authenticator_wop(sa_auth, proxy_url).await
+    }
+
+    pub async fn build_from_service_account_key_file_wop(
+        &self,
+        sa_key_file: &str,
+        proxy_url: Option<&str>
+    ) -> Result<Client, BQError> {
+        let scopes = vec![self.auth_base_url.as_str()];
+        let sa_auth = service_account_authenticator(scopes, sa_key_file).await?;
+
+        self.build_from_authenticator_wop(sa_auth, proxy_url).await
+    }
 }
 
 impl Default for ClientBuilder {
