@@ -134,6 +134,7 @@ impl Client {
     /// Constructs a new BigQuery client.
     /// # Argument
     /// * `sa_key_file` - A GCP Service Account Key file.
+    /// * `proxy_url` - A optional url for using outbound proxy.
     pub async fn from_service_account_key_file_with_optional_proxy(sa_key_file: &str, proxy_url: Option<&str>) -> Result<Self, BQError> {
         ClientBuilder::new()
             .build_from_service_account_key_file_wop(sa_key_file, proxy_url)
@@ -145,7 +146,8 @@ impl Client {
     /// # Argument
     /// * `sa_key` - A GCP Service Account Key `yup-oauth2` object.
     /// * `readonly` - A boolean setting whether the acquired token scope should be readonly.
-    ///
+    /// * `proxy_url` - A optional url for using outbound proxy.
+    /// 
     /// [`ServiceAccountKey`]: https://docs.rs/yup-oauth2/*/yup_oauth2/struct.ServiceAccountKey.html
     pub async fn from_service_account_key_with_optional_proxy(sa_key: ServiceAccountKey, readonly: bool, proxy_url: Option<&str>) -> Result<Self, BQError> {
         ClientBuilder::new()
