@@ -211,6 +211,7 @@ impl Client {
 
     /// Returns a job API handler.
     pub fn job(&self) -> &JobApi {
+        println!("getting jobs from client");
         &self.job_api
     }
 

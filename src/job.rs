@@ -49,13 +49,16 @@ impl JobApi {
     /// * `project_id` - Project ID of the query request.
     /// * `query_request` - The request body contains an instance of QueryRequest.
     pub async fn query(&self, project_id: &str, query_request: QueryRequest) -> Result<QueryResponse, BQError> {
+        println!("initiating query submittion flow");
         let req_url = format!(
             "{base_url}/projects/{project_id}/queries",
             base_url = self.base_url,
             project_id = urlencode(project_id)
         );
+        println!("request url: {req_url}");
 
         let access_token = self.auth.access_token().await?;
+        println!("access_token fetched succefully: len to token: {}", access_token.len());
 
         let request = self
             .client
@@ -64,7 +67,10 @@ impl JobApi {
             .json(&query_request)
             .build()?;
 
+        println!("request build successfully");
+
         let resp = self.client.execute(request).await?;
+        println!("response fetched successfully");
 
         let query_response: QueryResponse = process_response(resp).await?;
         Ok(query_response)
