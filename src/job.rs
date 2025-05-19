@@ -65,11 +65,18 @@ impl JobApi {
             .post(req_url.as_str())
             .bearer_auth(access_token)
             .json(&query_request)
-            .build()?;
+            .build()
+            .map_err(|e| {
+                println!("error building request: {:?}", e);
+                e
+            })?;
 
         println!("request build successfully");
 
-        let resp = self.client.execute(request).await?;
+        let resp = self.client.execute(request).await.map_err(|e| {
+            println!("error getting response: {:?}", e);
+            e
+        })?;
         println!("response fetched successfully");
 
         let query_response: QueryResponse = process_response(resp).await?;
