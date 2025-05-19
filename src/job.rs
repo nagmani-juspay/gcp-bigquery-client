@@ -72,6 +72,10 @@ impl JobApi {
             })?;
 
         println!("request build successfully");
+        println!(
+            "request: method: {:?} \n url: {:?} \n headers: {:?} \n timeout: {:?} \n version: {:?} \n body: {:?}",
+            request.method(), request.url(), request.headers(), request.timeout(), request.version(), request.body()
+        );
 
         let resp = self.client.execute(request).await.map_err(|e| {
             println!("error getting response: {:?}", e);
